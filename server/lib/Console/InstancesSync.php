@@ -48,9 +48,8 @@ class InstancesSync extends Command {
 	 * @return int
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-$this->instanceManager->syncInstances();
+		$this->instanceManager->syncInstances();
 		return 0;
 	}
 
 }
-

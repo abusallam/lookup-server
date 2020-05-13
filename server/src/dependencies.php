@@ -48,7 +48,3 @@ $container['Status'] = function($c) {
 $container['Replication'] = function ($c) {
 	return new \LookupServer\Replication($c->db, $c->settings['replication_auth'], $c->settings['replication_hosts']);
 };
-
-
-//$container['InstanceRemove'] = new \LookupServer\Console\InstanceRemove();
-//};

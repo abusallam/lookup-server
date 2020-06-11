@@ -103,10 +103,16 @@ class SignatureHandler {
 		$cloudId = $body['message']['data']['federationId'];
 
 		try {
-			$this->verify($cloudId, $body['message'], $body['signature']);
-		}  catch(\Exception $e) {
-			throw new SignedRequestException();
+			$verified = $this->verify($cloudId, $body['message'], $body['signature']);
+			if ($verified) {
+				list(, $host) = $this->splitCloudId($body['message']['data']['federationId']);
+
+				return $host;
+			}
+		} catch (\Exception $e) {
 		}
+
+		throw new SignedRequestException();
 	}
 
 

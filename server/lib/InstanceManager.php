@@ -60,17 +60,23 @@ class InstanceManager {
 	 */
 	public function getInstances(Request $request, Response $response): Response {
 		try {
-			$this->signatureHandler->verifyRequest($request);
-		}  catch(\Exception $e) {
+			$source = $this->signatureHandler->verifyRequest($request);
+		} catch (\Exception $e) {
 			$response->withStatus(400);
+
 			return $response;
 		}
 
 		$instances = $this->getAll();
-
 		if (empty($instances)) {
 			$this->syncInstances();
 			$instances = $this->getAll();
+		}
+
+		if (!in_array($source, $instances)) {
+			$response->withStatus(400);
+
+			return $response;
 		}
 
 		$response->getBody()

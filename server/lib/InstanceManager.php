@@ -14,14 +14,19 @@ class InstanceManager {
 	/** @var PDO */
 	private $db;
 
+	/** @var SignatureHandler */
+	private $signatureHandler;
+
 
 	/**
 	 * InstanceManager constructor.
 	 *
 	 * @param PDO $db
+	 * @param SignatureHandler $signatureHandler
 	 */
-	public function __construct(PDO $db) {
+	public function __construct(PDO $db, SignatureHandler $signatureHandler) {
 		$this->db = $db;
+		$this->signatureHandler = $signatureHandler;
 	}
 
 
@@ -54,6 +59,13 @@ class InstanceManager {
 	 * @return Response
 	 */
 	public function getInstances(Request $request, Response $response): Response {
+		try {
+			$this->signatureHandler->verifyRequest($request);
+		}  catch(\Exception $e) {
+			$response->withStatus(400);
+			return $response;
+		}
+
 		$instances = $this->getAll();
 
 		if (empty($instances)) {
@@ -154,9 +166,6 @@ class InstanceManager {
 		$stmt->bindParam(':id', $userId);
 		$stmt->execute();
 	}
-
-
-
 
 
 	/**

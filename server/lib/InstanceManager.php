@@ -17,16 +17,31 @@ class InstanceManager {
 	/** @var SignatureHandler */
 	private $signatureHandler;
 
+	/** @var bool */
+	private $globalScaleMode = false;
+
+	/** @var string */
+	private $authKey = '';
+
 
 	/**
 	 * InstanceManager constructor.
 	 *
 	 * @param PDO $db
 	 * @param SignatureHandler $signatureHandler
+	 * @param bool $globalScaleMode
+	 * @param string $authKey
 	 */
-	public function __construct(PDO $db, SignatureHandler $signatureHandler) {
+	public function __construct(
+		PDO $db,
+		SignatureHandler $signatureHandler,
+		bool $globalScaleMode,
+		string $authKey
+	) {
 		$this->db = $db;
 		$this->signatureHandler = $signatureHandler;
+		$this->globalScaleMode = $globalScaleMode;
+		$this->authKey = $authKey;
 	}
 
 
@@ -59,10 +74,21 @@ class InstanceManager {
 	 * @return Response
 	 */
 	public function getInstances(Request $request, Response $response): Response {
-		try {
-			$source = $this->signatureHandler->verifyRequest($request);
-		} catch (\Exception $e) {
+		if ($this->globalScaleMode !== true) {
+			$response->withStatus(404);
+
+			return $response;
+		}
+
+		$body = json_decode($request->getBody(), true);
+		if ($body === null || !isset($body['authKey'])) {
 			$response->withStatus(400);
+
+			return $response;
+		}
+
+		if ($body['authKey'] !== $this->authKey) {
+			$response->withStatus(403);
 
 			return $response;
 		}
@@ -71,12 +97,6 @@ class InstanceManager {
 		if (empty($instances)) {
 			$this->syncInstances();
 			$instances = $this->getAll();
-		}
-
-		if (!in_array($source, $instances)) {
-			$response->withStatus(400);
-
-			return $response;
 		}
 
 		$response->getBody()

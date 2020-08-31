@@ -15,7 +15,7 @@ $container['SignatureHandler'] = function($c) {
 	return new \LookupServer\SignatureHandler();
 };
 $container['InstanceManager'] = function($c) {
-	return new \LookupServer\InstanceManager($c->db, $c->SignatureHandler);
+	return new \LookupServer\InstanceManager($c->db, $c->SignatureHandler, $c['settings']['global_scale'], $c['settings']['auth_key']);
 };
 $container['TwitterOAuth'] = function($c) {
 	$twitterConf = $c['settings']['twitter'];

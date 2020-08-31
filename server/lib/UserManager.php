@@ -44,6 +44,7 @@ class UserManager {
 	 * @param Email $emailValidator
 	 * @param Website $websiteValidator
 	 * @param Twitter $twitterValidator
+	 * @param InstanceManager $instanceManager
 	 * @param SignatureHandler $signatureHandler
 	 * @param bool $globalScaleMode
 	 * @param string $authKey
